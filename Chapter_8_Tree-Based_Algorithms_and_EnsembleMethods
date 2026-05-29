@@ -1,1 +1,101 @@
-
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# 🌳 Chapter 8: Tree-Based Algorithms\n",
+    "**Referensi Buku:** *scikit-learn Cookbook, Third Edition*\n",
+    "\n",
+    "---\n",
+    "## 1. Pendahuluan\n",
+    "Decision Tree bekerja dengan membelah ruang data menggunakan aturan pertanyaan bersyarat (*if-else*). Kita akan mengeksplorasi dari model pohon tunggal hingga metode *ensemble* tingkat lanjut."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "from sklearn.datasets import make_classification\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.tree import DecisionTreeClassifier, plot_tree\n",
+    "from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier\n",
+    "from sklearn.metrics import accuracy_score\n",
+    "\n",
+    "%matplotlib inline\n",
+    "np.random.seed(42)\n",
+    "\n",
+    "X, y = make_classification(n_samples=500, n_features=4, n_informative=2, random_state=42)\n",
+    "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2. Decision Tree Classifier\n",
+    "Sangat interpretabel, namun pohon yang terlalu dalam rentan menghafal data latih (*overfitting*). Kita akan membatasi kedalamannya (`max_depth`)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dt = DecisionTreeClassifier(max_depth=3, random_state=42)\n",
+    "dt.fit(X_train, y_train)\n",
+    "print(f\"Akurasi Decision Tree: {accuracy_score(y_test, dt.predict(X_test)):.3f}\")\n",
+    "\n",
+    "plt.figure(figsize=(12, 6))\n",
+    "plot_tree(dt, filled=True, rounded=True, class_names=['0', '1'])\n",
+    "plt.title('Visualisasi Decision Tree (max_depth=3)')\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 3. Ensemble: Random Forest & Gradient Boosting\n",
+    "Metode *ensemble* menggabungkan ratusan pohon keputusan menjadi satu prediktor super."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Random Forest (Paralel)\n",
+    "rf = RandomForestClassifier(n_estimators=100, random_state=42)\n",
+    "rf.fit(X_train, y_train)\n",
+    "print(f\"Akurasi Random Forest: {accuracy_score(y_test, rf.predict(X_test)):.3f}\")\n",
+    "\n",
+    "# Gradient Boosting (Sekuensial)\n",
+    "gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42)\n",
+    "gb.fit(X_train, y_train)\n",
+    "print(f\"Akurasi Gradient Boosting: {accuracy_score(y_test, gb.predict(X_test)):.3f}\")\n",
+    "\n",
+    "# Fitur Importance\n",
+    "plt.figure(figsize=(6, 4))\n",
+    "plt.bar([f'Fitur {i}' for i in range(4)], gb.feature_importances_, color='teal')\n",
+    "plt.title('Fitur Importance dari Gradient Boosting')\n",
+    "plt.show()"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
